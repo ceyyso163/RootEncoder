@@ -129,22 +129,32 @@ class H264Packet(
   private fun setSpsPps(sps: ByteArray, pps: ByteArray) {
     this.sps = sps
     this.pps = pps
-    stapA = ByteArray(sps.size + pps.size + 5)
+//    stapA = ByteArray(sps.size + pps.size + 5)
+//    stapA?.let {
+//      // STAP-A NAL header is 24
+//      it[0] = 24
+
+//      // Write NALU 1 size into the array (NALU 1 is the SPS).
+//      it[1] = (sps.size shr 8).toByte()
+//      it[2] = (sps.size and 0xFF).toByte()
+
+//      // Write NALU 2 size into the array (NALU 2 is the PPS).
+//      it[sps.size + 3] = (pps.size shr 8).toByte()
+//      it[sps.size + 4] = (pps.size and 0xFF).toByte()
+
+//      // Write NALU 1 into the array, then write NALU 2 into the array.
+//      System.arraycopy(sps, 0, it, 3, sps.size)
+//      System.arraycopy(pps, 0, it, 5 + sps.size, pps.size)
+//    }
+    stapA = ByteArray(sps.size + pps.size + 4)
     stapA?.let {
-      // STAP-A NAL header is 24
-      it[0] = 24
-
-      // Write NALU 1 size into the array (NALU 1 is the SPS).
-      it[1] = (sps.size shr 8).toByte()
-      it[2] = (sps.size and 0xFF).toByte()
-
-      // Write NALU 2 size into the array (NALU 2 is the PPS).
-      it[sps.size + 3] = (pps.size shr 8).toByte()
-      it[sps.size + 4] = (pps.size and 0xFF).toByte()
-
       // Write NALU 1 into the array, then write NALU 2 into the array.
-      System.arraycopy(sps, 0, it, 3, sps.size)
-      System.arraycopy(pps, 0, it, 5 + sps.size, pps.size)
+      System.arraycopy(sps, 0, it, 0, sps.size)
+      it[sps.size] = 0x0
+      it[sps.size+1] = 0x0
+      it[sps.size+2] = 0x0
+      it[sps.size+3] = 0x1
+      System.arraycopy(pps, 0, it, 4+sps.size, pps.size)
     }
   }
 
